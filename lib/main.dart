@@ -10,12 +10,16 @@ class Salawati extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('صلواتي'),
+          title: const Align(
+            alignment: Alignment.topRight, 
+            child: Text(' صلواتي'),
+          ),
         ),
         body: const Center(
-          child: Text('Welcome to Salawati!'),
+          child: Text('مرحبًا بك في صلواتي!'),
         ),
       ),
     );

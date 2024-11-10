@@ -14,14 +14,17 @@ class Salawati extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           title: const Align(
-            alignment: Alignment.topRight, 
-            child: Text(' صلواتي'),
+            alignment: Alignment.center,
+            child: Text(
+              "صلوات المسلم",
+              style: TextStyle(
+                fontFamily: 'Amiri-Regular', 
+                fontSize: 28,
+              ),
+            ),
           ),
         ),
-        body: const Center(
-          child: Text('مرحبًا بك في صلواتي!'),
-        ),
-      ),
+          ),
     );
   }
 }

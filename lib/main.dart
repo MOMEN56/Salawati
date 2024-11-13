@@ -3,7 +3,7 @@ import 'package:salawati/widgits/custom_app_bar.dart';
 
 void main() {
   runApp(const Salawati());
-}
+}   
 
 class Salawati extends StatelessWidget {
   const Salawati({super.key});

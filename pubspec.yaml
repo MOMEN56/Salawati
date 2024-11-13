@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   flutter_launcher_icons: ^0.14.1
+  flutter_native_splash: ^2.4.2
 
 dev_dependencies:
   flutter_test:
@@ -24,10 +25,16 @@ flutter_icons:
   image_path: "assets/icon/icon.png"
   adaptive_icon_foreground: 'assets/icon/icon.png'
   adaptive_icon_background: 'assets/icon/icon.png'
-
+flutter_native_splash:
+  color: "#FFFFFF"  # اللون الأبيض
+  image: "assets/intro/intro_image.png"  # المسار الصحيح لصورة شاشة البداية
+  android: true
+  ios: true
+  resizeMode: "cover"
 flutter:
   uses-material-design: true
   assets:
+    - assets/intro/intro_image.png  # تأكد من إضافة الصورة للمسار الصحيح
     - assets/icon/icon.png
   fonts:
     - family: Amiri-Regular

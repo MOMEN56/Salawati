@@ -7,27 +7,27 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFD8BC78), // تغيير لون الخلفية
+        color: const Color(0xFFD8BC78), 
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2), // لون الظل مع الشفافية
-            blurRadius: 8,  // تأثير الضبابية للظل
-            offset: const Offset(0,8),  // إزاحة الظل للأسفل
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8, 
+            offset: const Offset(0,8),  
           ),
         ],
       ),
       child: AppBar(
-        backgroundColor: Colors.transparent,  // شفافية الخلفية داخل الـ AppBar
-        elevation: 5,  // إزالة الظل الافتراضي من الـ AppBar
+        backgroundColor: Colors.transparent,  
+        elevation: 5,  
         title: const Align(
-          alignment: Alignment.topCenter,  // محاذاة النص في الأعلى
+          alignment: Alignment.topCenter, 
           child: Padding(
-            padding: EdgeInsets.only(bottom: 20),  // تحريك النص للأعلى
+            padding: EdgeInsets.only(bottom: 20), 
             child: Text(
               "صلوات المسلم",
               style: TextStyle(
                 fontSize: 30,
-                fontFamily: 'Amiri-Regular', // استخدام الخط المخصص
+                fontFamily: 'Amiri-Regular', 
               ),
             ),
           ),

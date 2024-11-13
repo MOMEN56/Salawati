@@ -14,7 +14,7 @@ class QuranicVerse extends StatelessWidget {
           children: [
             Text(
               "﴾",
-              style: TextStyle(fontSize: 18), // حجم الخط للقوس
+              style: TextStyle(fontSize: 20), // حجم الخط للقوس
             ),
             SizedBox(width: 4), // مسافة بين القوس والنص
             Text(
@@ -24,7 +24,7 @@ class QuranicVerse extends StatelessWidget {
             SizedBox(width: 4), // مسافة بين النص والقوس الآخر
             Text(
               "﴿",
-              style: TextStyle(fontSize: 18), // حجم الخط للقوس الآخر
+              style: TextStyle(fontSize: 20), // حجم الخط للقوس الآخر
             ),
             SizedBox(width: 2),
             Text(

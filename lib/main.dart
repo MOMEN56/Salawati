@@ -18,7 +18,7 @@ class Salawati extends StatelessWidget {
       home: const Scaffold(
         appBar: CustomAppBar(),
         body: Center(
-          child: Text('Welcome to Salawati!'),
+          child: Text('Welcome to Salawati'),
         ),
       ),
     );

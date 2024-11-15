@@ -38,7 +38,7 @@ class Prayers extends StatelessWidget {
               height: 2, // سماكة الخط
               color: Colors.grey, // لون الخط
             ),
-            const SizedBox(height: 24), // مسافة بين الأقسام
+            const SizedBox(height: 24), // 24مسافة بين الأقسام
           ],
         );
       }).toList(),

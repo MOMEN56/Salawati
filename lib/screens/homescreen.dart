@@ -48,16 +48,25 @@ class _HomescreenState extends State<Homescreen> {
           {"time": data['Maghrib'], "prayerName": "المغرب"},
           {"time": data['Isha'], "prayerName": "العشاء"},
           {"time": data['Sunrise'], "prayerName": "الشروق"},
-          {"time": "00", "prayerName": "الوقت المتبقي علي الصلاة"},
         ];
         isLoading = false;
-        calculateRemainingTime();  // حساب الوقت المتبقي على الصلاة القادمة بعد تحميل الأوقات
       });
+      calculateRemainingTime();  // حساب الوقت المتبقي على الصلاة القادمة بعد تحميل الأوقات
     } catch (e) {
       setState(() {
         isLoading = false;
       });
       print('Error fetching prayer times: $e');
+    }
+  }
+
+  // دالة لتحويل الوقت إلى DateTime
+  DateTime parsePrayerTime(String timeString) {
+    try {
+      return DateFormat("HH:mm").parse(timeString);  // استخدام 24 ساعة
+    } catch (e) {
+      print("Error parsing time: $timeString");
+      rethrow;
     }
   }
 
@@ -69,10 +78,14 @@ class _HomescreenState extends State<Homescreen> {
     // تحويل أوقات الصلاة إلى DateTime
     for (var prayer in prayerTimes) {
       if (prayer['time'] != "00") {
-        var time = prayer['time']!;
-        DateTime prayerTime = DateFormat("hh:mm a").parse(time);  // تحويل الوقت من نص إلى DateTime
-        DateTime prayerDateTime = DateTime(now.year, now.month, now.day, prayerTime.hour, prayerTime.minute);
-        prayerDateTimes.add(prayerDateTime);
+        var timeString = prayer['time']!;
+        try {
+          DateTime prayerTime = parsePrayerTime(timeString);  // استخدام دالة تحويل الوقت
+          DateTime prayerDateTime = DateTime(now.year, now.month, now.day, prayerTime.hour, prayerTime.minute);
+          prayerDateTimes.add(prayerDateTime);
+        } catch (e) {
+          print("Error parsing time: ${prayer['time']}");
+        }
       }
     }
 
@@ -116,13 +129,24 @@ class _HomescreenState extends State<Homescreen> {
                   prayerTimes: prayerTimes,
                 ),
               ),
-            SizedBox(height: 20),
-            if (remainingTime.isNotEmpty)
-              Text(
-                "الوقت المتبقي على الصلاة القادمة: $remainingTime",
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            if (remainingTime.isNotEmpty)  // فقط إذا كان الوقت المتبقي موجودًا
+              Padding(
+                padding: const EdgeInsets.only(top: 0),
+                child: Column(
+                  children: [
+                    Text(
+                      "الوقت المتبقي: $remainingTime",
+                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 24),  // المسافة بين النص والخط
+                    Container(
+                      height: 2,  // سماكة الخط
+                      color: Colors.grey, // لون الخط
+                    ),
+                  ],
+                ),
               ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 35),
             const QuranicVerse(),
           ],
         ),

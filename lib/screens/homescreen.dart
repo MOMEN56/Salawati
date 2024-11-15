@@ -1,9 +1,11 @@
+// lib/homescreen.dart
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart'; // لتنسيق الوقت
 import 'package:salawati/models/prayers_model.dart';
 import 'package:salawati/widgits/custom_app_bar.dart';
 import 'package:salawati/widgits/quranic_verse.dart';
+import 'package:salawati/services/prayer_api.dart';  // استيراد PrayerApi
 
 void main() {
   runApp(const MaterialApp(home: Homescreen()));
@@ -21,6 +23,8 @@ class _HomescreenState extends State<Homescreen> {
   bool isLoading = true;
   String remainingTime = "";  // لحفظ الوقت المتبقي على الصلاة القادمة
 
+  final PrayerApi _prayerApi = PrayerApi(Dio());  // استخدام PrayerApi
+
   @override
   void initState() {
     super.initState();
@@ -29,25 +33,15 @@ class _HomescreenState extends State<Homescreen> {
 
   Future<void> fetchPrayerTimes() async {
     try {
-      var dio = Dio();
-      final response = await dio.get(
-        'https://api.aladhan.com/v1/timings/16-11-2024',
-        queryParameters: {
-          'latitude': '31.2156',
-          'longitude': '29.9553',
-          'method': '5',
-        },
-      );
-
-      var data = response.data['data']['timings'];
+      var times = await _prayerApi.fetchPrayerTimes('16-11-2024', '31.2156', '29.9553');
       setState(() {
         prayerTimes = [
-          {"time": data['Fajr'], "prayerName": "الفجر"},
-          {"time": data['Dhuhr'], "prayerName": "الظهر"},
-          {"time": data['Asr'], "prayerName": "العصر"},
-          {"time": data['Maghrib'], "prayerName": "المغرب"},
-          {"time": data['Isha'], "prayerName": "العشاء"},
-          {"time": data['Sunrise'], "prayerName": "الشروق"},
+          {"time": times['Fajr']!, "prayerName": "الفجر"},
+          {"time": times['Dhuhr']!, "prayerName": "الظهر"},
+          {"time": times['Asr']!, "prayerName": "العصر"},
+          {"time": times['Maghrib']!, "prayerName": "المغرب"},
+          {"time": times['Isha']!, "prayerName": "العشاء"},
+          {"time": times['Sunrise']!, "prayerName": "الشروق"},
         ];
         isLoading = false;
       });
@@ -135,8 +129,8 @@ class _HomescreenState extends State<Homescreen> {
                 child: Column(
                   children: [
                     Text(
-                      "الوقت المتبقي: $remainingTime",
-                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                      "الوقت المتبقي على الصلاة: $remainingTime",
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 24),  // المسافة بين النص والخط
                     Container(

@@ -4,12 +4,11 @@ class PrayerTimesService {
   final Dio _dio = Dio();
 
   Future<List<Map<String, String>>> fetchPrayerTimes() async {
-    final String url =
-        'https://api.aladhan.com/v1/timings/16-11-2024'; // رابط API
+    final String url = 'https://api.aladhan.com/v1/timings/16-11-2024'; // تحديد التاريخ
     final Map<String, dynamic> queryParameters = {
-      'latitude': 31.2156, // خط العرض
-      'longitude': 29.9553, // خط الطول
-      'method': 5, // الطريقة الحسابية (Egyptian General Authority)
+      'latitude': 31.2156,  // إحداثيات خط العرض
+      'longitude': 29.9553, // إحداثيات خط الطول
+      'method': 5, // طريقة الحساب (حسب الطريقة المصرية)
     };
 
     try {
@@ -26,13 +25,13 @@ class PrayerTimesService {
           {"time": data['Isha'], "prayerName": "العشاء"},
         ];
       } else {
-        throw Exception('Failed to fetch prayer times');
+        throw Exception('فشل في جلب أوقات الصلاة');
       }
     } on DioError catch (e) {
       if (e.response != null) {
-        throw Exception('Error: ${e.response?.statusCode}, ${e.response?.data}');
+        throw Exception('خطأ: ${e.response?.statusCode}, ${e.response?.data}');
       } else {
-        throw Exception('Error: ${e.message}');
+        throw Exception('خطأ: ${e.message}');
       }
     }
   }

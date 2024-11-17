@@ -6,7 +6,8 @@ import 'package:salawati/widgits/custom_app_bar.dart';
 import 'package:salawati/widgits/quranic_verse.dart';
 import 'package:salawati/services/prayer_api.dart'; // استيراد PrayerApi
 import 'package:salawati/models/prayers_model.dart'; // استيراد PrayerApi
-import 'package:flutter_offline/flutter_offline.dart';
+import 'package:connectivity_plus/connectivity_plus.dart'; // استيراد الحزمة للتحقق من الاتصال
+
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
 
@@ -18,15 +19,30 @@ class _HomescreenState extends State<Homescreen> {
   List<Map<String, String>> prayerTimes = [];
   bool isLoading = true;
   String remainingTime = ""; // لحفظ الوقت المتبقي على الصلاة القادمة
+  bool isConnected = true; // لتحديد حالة الاتصال بالإنترنت
 
   final PrayerApi _prayerApi = PrayerApi(Dio()); // استخدام PrayerApi
 
   @override
   void initState() {
     super.initState();
-    fetchPrayerTimes();
+    checkConnection(); // التحقق من الاتصال بالإنترنت عند بدء التطبيق
   }
 
+  // دالة للتحقق من الاتصال بالإنترنت
+  Future<void> checkConnection() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        isConnected = false; // إذا لم يكن هناك اتصال
+        isLoading = false;
+      });
+    } else {
+      fetchPrayerTimes(); // إذا كان هناك اتصال، يتم جلب البيانات
+    }
+  }
+
+  // دالة لجلب أوقات الصلاة من API
   Future<void> fetchPrayerTimes() async {
     try {
       var times =
@@ -125,8 +141,7 @@ class _HomescreenState extends State<Homescreen> {
     return Scaffold(
       appBar: const CustomAppBar(),
       body: Padding(
-        padding:
-            const EdgeInsets.only(right: 16, left: 16, top: 28, bottom: 18),
+        padding: const EdgeInsets.only(right: 16, left: 16, top: 28, bottom: 18),
         child: Column(
           children: [
             if (isLoading)
@@ -135,10 +150,25 @@ class _HomescreenState extends State<Homescreen> {
                   child: CircularProgressIndicator(color: Color(0xFFD8BC78)),
                 ),
               ),
-            if (!isLoading)
+            if (!isLoading && isConnected)
               Expanded(
                 child: Prayers(
                   prayerTimes: prayerTimes,
+                ),
+              ),
+            if (!isConnected)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.signal_wifi_off, size: 50, color: Colors.grey),
+                      Text(
+                        'لا يوجد اتصال بالإنترنت',
+                        style: TextStyle(fontSize: 20, color: Colors.grey),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             if (remainingTime.isNotEmpty)

@@ -4,13 +4,36 @@ class TimeCalculator {
   // دالة لتحويل الوقت إلى تنسيق 12 ساعة
   static String formatTime12Hour(String timeString) {
     try {
-      final DateTime dateTime = DateFormat("HH:mm")
-          .parse(timeString); // تحويل الوقت من 24 ساعة إلى 12 ساعة
-      return DateFormat("hh:mm a")
-          .format(dateTime); // تنسيق الوقت بصيغة 12 ساعة
+      final DateTime dateTime = DateFormat("HH:mm").parse(timeString); // تحويل الوقت من 24 ساعة إلى 12 ساعة
+      String formattedTime = DateFormat("hh:mm a").format(dateTime); // تنسيق الوقت بصيغة 12 ساعة
+      // استبدال AM بـ "ص" و PM بـ "م"
+      formattedTime = formattedTime.replaceAll('AM', 'ص').replaceAll('PM', 'م');
+      return formattedTime;
     } catch (e) {
       print("Error formatting time: $e");
       return timeString; // إرجاع الوقت كما هو إذا حدث خطأ
+    }
+  }
+
+  // دالة لتحويل الساعة إلى صيغة عربية بدون الأرقام
+  static String formatHourString(int hour) {
+    if (hour == 1) {
+      return 'ساعة';
+    } else if (hour == 2) {
+      return 'ساعتين';
+    } else {
+      return '$hour ساعات';
+    }
+  }
+
+  // دالة لتحويل الدقائق إلى صيغة عربية بدون الأرقام
+  static String formatMinuteString(int minute) {
+    if (minute == 1 || minute == 21 || minute == 31 || minute == 41 || minute == 51) {
+      return 'دقيقة';
+    } else if (minute == 2 || minute == 22 || minute == 32 || minute == 42 || minute == 52) {
+      return 'دقيقتين';
+    } else {
+      return '$minute دقائق';
     }
   }
 
@@ -41,9 +64,10 @@ class TimeCalculator {
     for (var prayerDateTime in prayerDateTimes) {
       if (prayerDateTime.isAfter(now)) {
         Duration remainingDuration = prayerDateTime.difference(now);
-        String formattedTime = formatTime12Hour(
-            prayerDateTime.toString()); // استخدام التنسيق 12 ساعة
-        return "الوقت المتبقي على الصلاة القادمة: ${remainingDuration.inHours} ساعة و ${remainingDuration.inMinutes.remainder(60)} دقيقة، وقت الصلاة القادمة: $formattedTime";
+        String formattedTime = formatTime12Hour(prayerDateTime.toString()); // استخدام التنسيق 12 ساعة
+        String hourString = formatHourString(remainingDuration.inHours); // استخدام الدالة لتنسيق الساعة
+        String minuteString = formatMinuteString(remainingDuration.inMinutes.remainder(60)); // تنسيق الدقائق
+        return "الوقت المتبقي على الصلاة القادمة: $hourString و $minuteString، وقت الصلاة القادمة: $formattedTime";
       }
     }
 
@@ -71,8 +95,9 @@ class TimeCalculator {
         .sort((a, b) => a.compareTo(b)); // ترتيب أوقات الصلاة للغد
 
     Duration remainingDuration = nextDayPrayerTimes.first.difference(now);
-    String formattedTime = formatTime12Hour(
-        nextDayPrayerTimes.first.toString()); // استخدام التنسيق 12 ساعة
-    return "الوقت المتبقي على الصلاة القادمة: ${remainingDuration.inHours} ساعة و ${remainingDuration.inMinutes.remainder(60)} دقيقة، وقت الصلاة القادمة في اليوم التالي: $formattedTime";
+    String formattedTime = formatTime12Hour(nextDayPrayerTimes.first.toString()); // استخدام التنسيق 12 ساعة
+    String hourString = formatHourString(remainingDuration.inHours); // تنسيق الساعة للغد
+    String minuteString = formatMinuteString(remainingDuration.inMinutes.remainder(60)); // تنسيق الدقائق للغد
+    return "الوقت المتبقي على الصلاة القادمة: $hourString و $minuteString، وقت الصلاة القادمة في اليوم التالي: $formattedTime";
   }
 }

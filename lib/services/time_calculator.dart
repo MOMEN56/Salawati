@@ -28,9 +28,9 @@ class TimeCalculator {
 
   // دالة لتحويل الدقائق إلى صيغة عربية بدون الأرقام
   static String formatMinuteString(int minute) {
-    if (minute == 1 || minute == 21 || minute == 31 || minute == 41 || minute == 51) {
+    if (minute == 1 || minute == 21 || minute == 31 || minute == 41 || minute == 51|| minute == 22 || minute == 32 || minute == 42 || minute == 52) {
       return 'دقيقة';
-    } else if (minute == 2 || minute == 22 || minute == 32 || minute == 42 || minute == 52) {
+    } else if (minute == 2 ) {
       return 'دقيقتين';
     } else {
       return '$minute دقائق';

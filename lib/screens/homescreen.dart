@@ -5,6 +5,7 @@ import 'package:salawati/widgits/custom_app_bar.dart';
 import 'package:salawati/widgits/quranic_verse.dart';
 import 'package:salawati/services/prayer_api.dart'; // استيراد PrayerApi
 import 'package:salawati/models/prayers_model.dart'; // استيراد PrayerApi
+import 'package:salawati/widgits/time_remaining_widget.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -74,8 +75,10 @@ class _HomescreenState extends State<Homescreen> {
     prayerDateTimes.sort((a, b) => a.compareTo(b));
 
     // إيجاد أقرب صلاة قادمة
+    bool allPrayersPassed = true;
     for (var prayerDateTime in prayerDateTimes) {
       if (prayerDateTime.isAfter(now)) {
+        allPrayersPassed = false; // إذا كانت هناك صلاة لم تنتهي بعد
         Duration remainingDuration = prayerDateTime.difference(now);
         setState(() {
           remainingTime =
@@ -83,6 +86,35 @@ class _HomescreenState extends State<Homescreen> {
         });
         break;
       }
+    }
+
+    if (allPrayersPassed) {
+      // إذا كانت جميع الصلوات قد انتهت، نبحث عن أول صلاة في اليوم التالي
+      DateTime nextDay = now.add(const Duration(days: 1)); // اليوم التالي
+      List<DateTime> nextDayPrayerTimes = [];
+
+      // تحويل أوقات الصلاة للغد
+      for (var prayer in prayerTimes) {
+        if (prayer['time'] != "00") {
+          var timeString = prayer['time']!;
+          try {
+            DateTime prayerTime = DateFormat("HH:mm").parse(timeString);
+            DateTime nextDayPrayerDateTime = DateTime(nextDay.year, nextDay.month,
+                nextDay.day, prayerTime.hour, prayerTime.minute);
+            nextDayPrayerTimes.add(nextDayPrayerDateTime);
+          } catch (e) {
+            print("Error parsing time: ${prayer['time']}");
+          }
+        }
+      }
+
+      nextDayPrayerTimes.sort((a, b) => a.compareTo(b)); // ترتيب أوقات الصلاة للغد
+
+      Duration remainingDuration = nextDayPrayerTimes.first.difference(now);
+      setState(() {
+        remainingTime =
+            formatDuration(remainingDuration); // تنسيق الوقت المتبقي
+      });
     }
   }
 

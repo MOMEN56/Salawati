@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
+import 'package:salawati/services/format_duration.dart';
 import 'package:salawati/widgits/custom_app_bar.dart';
 import 'package:salawati/widgits/quranic_verse.dart';
 import 'package:salawati/services/prayer_api.dart'; // استيراد PrayerApi
 import 'package:salawati/models/prayers_model.dart'; // استيراد PrayerApi
-import 'package:salawati/widgits/time_remaining_widget.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -29,7 +29,8 @@ class _HomescreenState extends State<Homescreen> {
 
   Future<void> fetchPrayerTimes() async {
     try {
-      var times = await _prayerApi.fetchPrayerTimes('16-11-2024', '31.2156', '29.9553');
+      var times =
+          await _prayerApi.fetchPrayerTimes('16-11-2024', '31.2156', '29.9553');
       setState(() {
         prayerTimes = [
           {"time": times['Fajr']!, "prayerName": "الفجر"},
@@ -99,8 +100,8 @@ class _HomescreenState extends State<Homescreen> {
           var timeString = prayer['time']!;
           try {
             DateTime prayerTime = DateFormat("HH:mm").parse(timeString);
-            DateTime nextDayPrayerDateTime = DateTime(nextDay.year, nextDay.month,
-                nextDay.day, prayerTime.hour, prayerTime.minute);
+            DateTime nextDayPrayerDateTime = DateTime(nextDay.year,
+                nextDay.month, nextDay.day, prayerTime.hour, prayerTime.minute);
             nextDayPrayerTimes.add(nextDayPrayerDateTime);
           } catch (e) {
             print("Error parsing time: ${prayer['time']}");
@@ -108,7 +109,8 @@ class _HomescreenState extends State<Homescreen> {
         }
       }
 
-      nextDayPrayerTimes.sort((a, b) => a.compareTo(b)); // ترتيب أوقات الصلاة للغد
+      nextDayPrayerTimes
+          .sort((a, b) => a.compareTo(b)); // ترتيب أوقات الصلاة للغد
 
       Duration remainingDuration = nextDayPrayerTimes.first.difference(now);
       setState(() {
@@ -118,21 +120,13 @@ class _HomescreenState extends State<Homescreen> {
     }
   }
 
-  // دالة لتنسيق مدة الوقت المتبقي إلى ساعات ودقائق
-  String formatDuration(Duration duration) {
-    String hours = duration.inHours > 0 ? "${duration.inHours} ساعة" : "";
-    String minutes = duration.inMinutes.remainder(60) > 0
-        ? "${duration.inMinutes.remainder(60)} دقيقة"
-        : "";
-    return "$hours $minutes".trim();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(),
       body: Padding(
-        padding: const EdgeInsets.only(right: 16, left: 16, top: 28, bottom: 18),
+        padding:
+            const EdgeInsets.only(right: 16, left: 16, top: 28, bottom: 18),
         child: Column(
           children: [
             if (isLoading)
@@ -154,7 +148,8 @@ class _HomescreenState extends State<Homescreen> {
                   children: [
                     Text(
                       "الوقت المتبقي على الصلاة: $remainingTime",
-                      style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 25, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                     Container(

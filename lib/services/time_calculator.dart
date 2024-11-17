@@ -1,56 +1,78 @@
-// lib/services/time_calculator.dart
-import 'package:intl/intl.dart';  // لتنسيق الوقت
+import 'package:intl/intl.dart';
 
 class TimeCalculator {
-  // دالة لتحويل الوقت إلى DateTime
-  static DateTime parsePrayerTime(String timeString) {
+  // دالة لتحويل الوقت إلى تنسيق 12 ساعة
+  static String formatTime12Hour(String timeString) {
     try {
-      return DateFormat("HH:mm").parse(timeString);  // استخدام 24 ساعة
+      final DateTime dateTime = DateFormat("HH:mm")
+          .parse(timeString); // تحويل الوقت من 24 ساعة إلى 12 ساعة
+      return DateFormat("hh:mm a")
+          .format(dateTime); // تنسيق الوقت بصيغة 12 ساعة
     } catch (e) {
-      print("Error parsing time: $timeString");
-      rethrow;
+      print("Error formatting time: $e");
+      return timeString; // إرجاع الوقت كما هو إذا حدث خطأ
     }
   }
 
   // دالة لحساب الوقت المتبقي على الصلاة القادمة
   static String calculateRemainingTime(List<Map<String, String>> prayerTimes) {
-    DateTime now = DateTime.now();  // الوقت الحالي
+    DateTime now = DateTime.now(); // الوقت الحالي
     List<DateTime> prayerDateTimes = [];
 
-    // تحويل أوقات الصلاة إلى DateTime
+    // تحويل أوقات الصلاة من البيانات وإضافتها إلى القائمة
     for (var prayer in prayerTimes) {
       if (prayer['time'] != "00") {
         var timeString = prayer['time']!;
         try {
-          DateTime prayerTime = parsePrayerTime(timeString);  // استخدام دالة تحويل الوقت
-          DateTime prayerDateTime = DateTime(now.year, now.month, now.day, prayerTime.hour, prayerTime.minute);
-          prayerDateTimes.add(prayerDateTime);
+          // تحويل الوقت إلى 24 ساعة أولًا
+          DateTime prayerTime = DateFormat("HH:mm").parse(timeString);
+          DateTime prayerDateTime = DateTime(
+              now.year, now.month, now.day, prayerTime.hour, prayerTime.minute);
+          prayerDateTimes.add(prayerDateTime); // إضافة الوقت إلى القائمة
         } catch (e) {
           print("Error parsing time: ${prayer['time']}");
         }
       }
     }
 
-    // تصفية أوقات الصلاة التي لم تأتي بعد
-    prayerDateTimes.sort((a, b) => a.compareTo(b));
+    prayerDateTimes.sort((a, b) => a.compareTo(b)); // ترتيب أوقات الصلاة
 
-    // إيجاد أقرب صلاة قادمة
+    // البحث عن أول صلاة قادمة بعد الوقت الحالي
     for (var prayerDateTime in prayerDateTimes) {
       if (prayerDateTime.isAfter(now)) {
         Duration remainingDuration = prayerDateTime.difference(now);
-        return formatDuration(remainingDuration);  // تنسيق الوقت المتبقي
+        String formattedTime = formatTime12Hour(
+            prayerDateTime.toString()); // استخدام التنسيق 12 ساعة
+        return "الوقت المتبقي على الصلاة القادمة: ${remainingDuration.inHours} ساعة و ${remainingDuration.inMinutes.remainder(60)} دقيقة، وقت الصلاة القادمة: $formattedTime";
       }
     }
 
-    return "";  // إذا لم يكن هناك وقت متبقي، نرجع قيمة فارغة
-  }
+    // إذا لم تكن هناك صلوات قادمة اليوم، احسب للغد
+    DateTime nextDay = now.add(const Duration(days: 1)); // اليوم التالي
+    List<DateTime> nextDayPrayerTimes = [];
 
-  // دالة لتنسيق مدة الوقت المتبقي إلى ساعات ودقائق
-  static String formatDuration(Duration duration) {
-    String hours = duration.inHours > 0 ? "${duration.inHours} ساعة" : "";
-    String minutes = duration.inMinutes.remainder(60) > 0
-        ? "${duration.inMinutes.remainder(60)} دقيقة"
-        : "";
-    return "$hours $minutes".trim();
+    // تحويل أوقات الصلاة للغد
+    for (var prayer in prayerTimes) {
+      if (prayer['time'] != "00") {
+        var timeString = prayer['time']!;
+        try {
+          DateTime prayerTime = DateFormat("HH:mm").parse(timeString);
+          DateTime nextDayPrayerDateTime = DateTime(nextDay.year, nextDay.month,
+              nextDay.day, prayerTime.hour, prayerTime.minute);
+          nextDayPrayerTimes.add(
+              nextDayPrayerDateTime); // إضافة الوقت إلى قائمة أوقات الصلاة للغد
+        } catch (e) {
+          print("Error parsing time: ${prayer['time']}");
+        }
+      }
+    }
+
+    nextDayPrayerTimes
+        .sort((a, b) => a.compareTo(b)); // ترتيب أوقات الصلاة للغد
+
+    Duration remainingDuration = nextDayPrayerTimes.first.difference(now);
+    String formattedTime = formatTime12Hour(
+        nextDayPrayerTimes.first.toString()); // استخدام التنسيق 12 ساعة
+    return "الوقت المتبقي على الصلاة القادمة: ${remainingDuration.inHours} ساعة و ${remainingDuration.inMinutes.remainder(60)} دقيقة، وقت الصلاة القادمة في اليوم التالي: $formattedTime";
   }
 }

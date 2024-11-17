@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:salawati/screens/homescreen.dart';
-import 'package:salawati/widgits/custom_app_bar.dart';
 
 void main() {
   runApp(const Salawati());

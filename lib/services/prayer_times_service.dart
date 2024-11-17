@@ -1,10 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart'; // لتنسيق التاريخ
 
 class PrayerTimesService {
   final Dio _dio = Dio();
 
+  // دالة للحصول على أوقات الصلاة
   Future<List<Map<String, String>>> fetchPrayerTimes() async {
-    final String url = 'https://api.aladhan.com/v1/timings/16-11-2024'; // تحديد التاريخ
+    // الحصول على التاريخ الحالي بشكل ديناميكي
+    String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
+
+     String url = 'https://api.aladhan.com/v1/timings/$currentDate'; // تحديد التاريخ بناءً على التاريخ الحالي
     final Map<String, dynamic> queryParameters = {
       'latitude': 31.2156,  // إحداثيات خط العرض
       'longitude': 29.9553, // إحداثيات خط الطول
@@ -14,20 +19,27 @@ class PrayerTimesService {
     try {
       final response = await _dio.get(url, queryParameters: queryParameters);
 
-      if (response.statusCode == 200) {
+      // التأكد من نجاح الاستجابة
+      if (response.statusCode == 200 && response.data != null && response.data['data'] != null) {
         final data = response.data['data']['timings'];
-        return [
-          {"time": data['Fajr'], "prayerName": "الفجر"},
-          {"time": data['Sunrise'], "prayerName": "الشروق"},
-          {"time": data['Dhuhr'], "prayerName": "الظهر"},
-          {"time": data['Asr'], "prayerName": "العصر"},
-          {"time": data['Maghrib'], "prayerName": "المغرب"},
-          {"time": data['Isha'], "prayerName": "العشاء"},
-        ];
+
+        // التحقق من وجود كل وقت
+        if (data != null) {
+          return [
+            {"time": data['Fajr'], "prayerName": "الفجر"},
+            {"time": data['Sunrise'], "prayerName": "الشروق"},
+            {"time": data['Dhuhr'], "prayerName": "الظهر"},
+            {"time": data['Asr'], "prayerName": "العصر"},
+            {"time": data['Maghrib'], "prayerName": "المغرب"},
+            {"time": data['Isha'], "prayerName": "العشاء"},
+          ];
+        } else {
+          throw Exception('بيانات أوقات الصلاة غير موجودة');
+        }
       } else {
         throw Exception('فشل في جلب أوقات الصلاة');
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         throw Exception('خطأ: ${e.response?.statusCode}, ${e.response?.data}');
       } else {

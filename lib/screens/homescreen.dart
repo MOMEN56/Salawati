@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:salawati/services/format_duration.dart';
+import 'package:salawati/services/prayer_times.dart';
 import 'package:salawati/widgits/custom_app_bar.dart';
 import 'package:salawati/widgits/quranic_verse.dart';
 import 'package:salawati/services/prayer_api.dart'; // استيراد PrayerApi
 import 'package:salawati/models/prayers_model.dart'; // استيراد PrayerApi
+import 'package:hive/hive.dart'; // استيراد Hive
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -29,29 +31,59 @@ class _HomescreenState extends State<Homescreen> {
   }
 
   Future<void> fetchPrayerTimes() async {
-    try {
-      var times =
-          await _prayerApi.fetchPrayerTimes('16-11-2024', '31.2156', '29.9553');
+    var box = await Hive.openBox('prayerTimesBox'); // فتح الـ Box
+
+    // التحقق من وجود البيانات المخزنة
+    var storedPrayerTimes = box.get('prayerTimes');
+    if (storedPrayerTimes != null) {
       setState(() {
-        prayerTimes = [
-          {"time": times['Fajr']!, "prayerName": "الفجر"},
-          {"time": times['Sunrise']!, "prayerName": "الشروق"},
-          {"time": times['Dhuhr']!, "prayerName": "الظهر"},
-          {"time": times['Asr']!, "prayerName": "العصر"},
-          {"time": times['Maghrib']!, "prayerName": "المغرب"},
-          {"time": times['Isha']!, "prayerName": "العشاء"},
-        ];
+        prayerTimes = List<Map<String, String>>.from(storedPrayerTimes);
         isLoading = false;
-        hasError = false; // إعادة تعيين حالة الخطأ بعد نجاح الجلب
+        hasError = false;
       });
       calculateRemainingTime(); // حساب الوقت المتبقي بعد تحميل الأوقات
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-        hasError = true; // تحديد حالة الخطأ
-      });
-      print('Error fetching prayer times: $e');
+    } else {
+      try {
+        var times = await _prayerApi.fetchPrayerTimes('16-11-2024', '31.2156', '29.9553');
+        setState(() {
+          prayerTimes = [
+            {"time": times['Fajr']!, "prayerName": "الفجر"},
+            {"time": times['Sunrise']!, "prayerName": "الشروق"},
+            {"time": times['Dhuhr']!, "prayerName": "الظهر"},
+            {"time": times['Asr']!, "prayerName": "العصر"},
+            {"time": times['Maghrib']!, "prayerName": "المغرب"},
+            {"time": times['Isha']!, "prayerName": "العشاء"},
+          ];
+          isLoading = false;
+          hasError = false;
+        });
+
+        savePrayerTimesToHive(); // حفظ البيانات في Hive
+        calculateRemainingTime(); // حساب الوقت المتبقي بعد تحميل الأوقات
+      } catch (e) {
+        setState(() {
+          isLoading = false;
+          hasError = true; // تحديد حالة الخطأ
+        });
+      }
     }
+  }
+
+  // حفظ بيانات الصلاة في Hive
+  Future<void> savePrayerTimesToHive() async {
+    var box = await Hive.openBox('prayerTimesBox');
+    var prayerTimesList = prayerTimes.map((prayer) {
+      return PrayerTime(
+        date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        fajr: prayer['time']!,
+        sunrise: prayer['time']!,
+        dhuhr: prayer['time']!,
+        asr: prayer['time']!,
+        maghrib: prayer['time']!,
+        isha: prayer['time']!,
+      );
+    }).toList();
+    await box.put('prayerTimes', prayerTimesList);
   }
 
   // دالة لحساب الوقت المتبقي على الصلاة القادمة
@@ -63,15 +95,11 @@ class _HomescreenState extends State<Homescreen> {
     for (var prayer in prayerTimes) {
       if (prayer['time'] != "00") {
         var timeString = prayer['time']!;
-        try {
-          // تحويل الوقت إلى DateTime
-          DateTime prayerTime = DateFormat("HH:mm").parse(timeString);
-          DateTime prayerDateTime = DateTime(
-              now.year, now.month, now.day, prayerTime.hour, prayerTime.minute);
-          prayerDateTimes.add(prayerDateTime);
-        } catch (e) {
-          print("Error parsing time: ${prayer['time']}");
-        }
+        // تحويل الوقت إلى DateTime
+        DateTime prayerTime = DateFormat("HH:mm").parse(timeString);
+        DateTime prayerDateTime = DateTime(
+            now.year, now.month, now.day, prayerTime.hour, prayerTime.minute);
+        prayerDateTimes.add(prayerDateTime);
       }
     }
 
@@ -101,14 +129,10 @@ class _HomescreenState extends State<Homescreen> {
       for (var prayer in prayerTimes) {
         if (prayer['time'] != "00") {
           var timeString = prayer['time']!;
-          try {
-            DateTime prayerTime = DateFormat("HH:mm").parse(timeString);
-            DateTime nextDayPrayerDateTime = DateTime(nextDay.year,
-                nextDay.month, nextDay.day, prayerTime.hour, prayerTime.minute);
-            nextDayPrayerTimes.add(nextDayPrayerDateTime);
-          } catch (e) {
-            print("Error parsing time: ${prayer['time']}");
-          }
+          DateTime prayerTime = DateFormat("HH:mm").parse(timeString);
+          DateTime nextDayPrayerDateTime = DateTime(nextDay.year,
+              nextDay.month, nextDay.day, prayerTime.hour, prayerTime.minute);
+          nextDayPrayerTimes.add(nextDayPrayerDateTime);
         }
       }
 
@@ -175,26 +199,14 @@ class _HomescreenState extends State<Homescreen> {
                   prayerTimes: prayerTimes,
                 ),
               ),
-            if (remainingTime.isNotEmpty && !hasError)
+            if (remainingTime.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.only(top: 0),
-                child: Column(
-                  children: [
-                    Text(
-                      "الوقت المتبقي على الصلاة: $remainingTime",
-                      style: const TextStyle(
-                          fontSize: 25, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 5),
-                    Container(
-                      height: 2,
-                      color: Colors.grey,
-                    ),
-                  ],
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Text(
+                  'الوقت المتبقي للصلاة القادمة: $remainingTime',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
-            const SizedBox(height: 16),
-            const QuranicVerse(),
           ],
         ),
       ),

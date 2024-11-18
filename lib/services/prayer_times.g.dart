@@ -17,19 +17,34 @@ class PrayerTimeAdapter extends TypeAdapter<PrayerTime> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PrayerTime(
-      time: fields[0] as String,
-      prayerName: fields[1] as String,
+      date: fields[0] as String,
+      fajr: fields[1] as String,
+      sunrise: fields[2] as String,
+      dhuhr: fields[3] as String,
+      asr: fields[4] as String,
+      maghrib: fields[5] as String,
+      isha: fields[6] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, PrayerTime obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(7)
       ..writeByte(0)
-      ..write(obj.time)
+      ..write(obj.date)
       ..writeByte(1)
-      ..write(obj.prayerName);
+      ..write(obj.fajr)
+      ..writeByte(2)
+      ..write(obj.sunrise)
+      ..writeByte(3)
+      ..write(obj.dhuhr)
+      ..writeByte(4)
+      ..write(obj.asr)
+      ..writeByte(5)
+      ..write(obj.maghrib)
+      ..writeByte(6)
+      ..write(obj.isha);
   }
 
   @override

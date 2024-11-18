@@ -15,12 +15,12 @@ dependencies:
   flutter_native_splash: ^2.4.2
   hive: ^2.0.0
   hive_flutter: ^1.1.0
-  path_provider: ^2.0.1
+  path_provider: ^2.0.7
   dio: ^5.7.0
   intl: ^0.19.0
   connectivity_plus: ^6.1.0
   flutter_offline: ^4.0.0
-
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -38,7 +38,7 @@ flutter_native_splash:
   image: "assets/intro/intro_image.png"  # المسار الصحيح لصورة شاشة البداية
   android: true
   ios: true
-
+  analyzer: ^6.11.0
 flutter:
   uses-material-design: true
   assets:

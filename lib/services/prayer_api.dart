@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 
 class PrayerApi {
@@ -9,26 +8,28 @@ class PrayerApi {
   Future<Map<String, String>> fetchPrayerTimes(String date, String latitude, String longitude) async {
     try {
       final response = await dio.get(
-        'https://api.aladhan.com/v1/timings/$date',
+        'https://api.aladhan.com/v1/timingsByCity',
         queryParameters: {
-          'latitude': latitude,
-          'longitude': longitude,
-          'method': '5', 
+          'city': 'Alexandria',
+          'country': 'Egypt',
+          'method': 8,
         },
       );
 
-      var data = response.data['data']['timings'];
-      return {
-        "Fajr": data['Fajr'],
-        "Dhuhr": data['Dhuhr'],
-        "Asr": data['Asr'],
-        "Maghrib": data['Maghrib'],
-        "Isha": data['Isha'],
-        "Sunrise": data['Sunrise'],
-      };
+      if (response.statusCode == 200) {
+        return {
+          'Fajr': response.data['data']['timings']['Fajr'],
+          'Sunrise': response.data['data']['timings']['Sunrise'],
+          'Dhuhr': response.data['data']['timings']['Dhuhr'],
+          'Asr': response.data['data']['timings']['Asr'],
+          'Maghrib': response.data['data']['timings']['Maghrib'],
+          'Isha': response.data['data']['timings']['Isha'],
+        };
+      } else {
+        throw Exception('فشل في جلب البيانات');
+      }
     } catch (e) {
-      print('Error fetching prayer times: $e');
-      rethrow;
+      throw Exception('حدث خطأ أثناء جلب البيانات');
     }
   }
 }

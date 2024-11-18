@@ -6,7 +6,7 @@ import 'package:salawati/widgits/custom_app_bar.dart';
 import 'package:salawati/widgits/quranic_verse.dart';
 import 'package:salawati/services/prayer_api.dart'; // استيراد PrayerApi
 import 'package:salawati/models/prayers_model.dart'; // استيراد PrayerApi
-import 'package:flutter_offline/flutter_offline.dart';
+
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
 
@@ -17,6 +17,7 @@ class Homescreen extends StatefulWidget {
 class _HomescreenState extends State<Homescreen> {
   List<Map<String, String>> prayerTimes = [];
   bool isLoading = true;
+  bool hasError = false; // متغير لتتبع حالة الخطأ
   String remainingTime = ""; // لحفظ الوقت المتبقي على الصلاة القادمة
 
   final PrayerApi _prayerApi = PrayerApi(Dio()); // استخدام PrayerApi
@@ -41,11 +42,13 @@ class _HomescreenState extends State<Homescreen> {
           {"time": times['Isha']!, "prayerName": "العشاء"},
         ];
         isLoading = false;
+        hasError = false; // إعادة تعيين حالة الخطأ بعد نجاح الجلب
       });
       calculateRemainingTime(); // حساب الوقت المتبقي بعد تحميل الأوقات
     } catch (e) {
       setState(() {
         isLoading = false;
+        hasError = true; // تحديد حالة الخطأ
       });
       print('Error fetching prayer times: $e');
     }
@@ -125,8 +128,7 @@ class _HomescreenState extends State<Homescreen> {
     return Scaffold(
       appBar: const CustomAppBar(),
       body: Padding(
-        padding:
-            const EdgeInsets.only(right: 16, left: 16, top: 28, bottom: 18),
+        padding: const EdgeInsets.only(right: 16, left: 16, top: 28, bottom: 18),
         child: Column(
           children: [
             if (isLoading)
@@ -135,13 +137,45 @@ class _HomescreenState extends State<Homescreen> {
                   child: CircularProgressIndicator(color: Color(0xFFD8BC78)),
                 ),
               ),
-            if (!isLoading)
+            if (!isLoading && hasError)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error,
+                        color: Colors.red,
+                        size: 60,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "حدث خطأ أثناء جلب البيانات. يرجى المحاولة لاحقًا.",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            isLoading = true;
+                            hasError = false;
+                          });
+                          fetchPrayerTimes(); // إعادة المحاولة
+                        },
+                        child: const Text("إعادة المحاولة"),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            if (!isLoading && !hasError)
               Expanded(
                 child: Prayers(
                   prayerTimes: prayerTimes,
                 ),
               ),
-            if (remainingTime.isNotEmpty)
+            if (remainingTime.isNotEmpty && !hasError)
               Padding(
                 padding: const EdgeInsets.only(top: 0),
                 child: Column(

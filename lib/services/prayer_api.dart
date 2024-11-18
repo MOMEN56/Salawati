@@ -13,7 +13,7 @@ class PrayerApi {
         queryParameters: {
           'latitude': latitude,
           'longitude': longitude,
-          'method': '5', // طريقة حساب أوقات الصلاة
+          'method': '5', 
         },
       );
 

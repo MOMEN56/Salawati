@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:salawati/screens/homescreen.dart';
 
-void main() async{
-  await Hive.initFlutter();
+void main() {
   runApp(const Salawati());
 }
 
@@ -15,12 +12,10 @@ class Salawati extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData( 
+      theme: ThemeData(
         fontFamily: 'Amiri-Regular',
       ),
-      home: const Scaffold(
-        body: Homescreen(),
-      ),
+      home:const Homescreen(),
     );
   }
 }

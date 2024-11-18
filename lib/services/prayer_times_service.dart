@@ -4,16 +4,16 @@ import 'package:intl/intl.dart'; // لتنسيق التاريخ
 class PrayerTimesService {
   final Dio _dio = Dio();
 
-  // دالة للحصول على أوقات الصلاة
+  
   Future<List<Map<String, String>>> fetchPrayerTimes() async {
-    // الحصول على التاريخ الحالي بشكل ديناميكي
+    
     String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
 
      String url = 'https://api.aladhan.com/v1/timings/$currentDate'; // تحديد التاريخ بناءً على التاريخ الحالي
     final Map<String, dynamic> queryParameters = {
-      'latitude': 31.2156,  // إحداثيات خط العرض
-      'longitude': 29.9553, // إحداثيات خط الطول
-      'method': 5, // طريقة الحساب (حسب الطريقة المصرية)
+      'latitude': 31.2156, 
+      'longitude': 29.9553, 
+      'method': 5, 
     };
 
     try {

@@ -1,11 +1,11 @@
 import 'package:hive/hive.dart';
 
-part 'prayer_times.g.dart';  // لا تنسى هذا السطر
+part 'prayer_times.g.dart';
 
 @HiveType(typeId: 0)
 class PrayerTime {
   @HiveField(0)
-  final String date; // إضافة التاريخ
+  final String date;
   @HiveField(1)
   final String fajr;
   @HiveField(2)

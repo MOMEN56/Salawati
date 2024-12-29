@@ -5,10 +5,11 @@ class PrayerApi {
 
   PrayerApi(this.dio);
 
-  Future<Map<String, String>> fetchPrayerTimes(String date, String latitude, String longitude) async {
+  Future<Map<String, String>> fetchPrayerTimes(
+      String date, String latitude, String longitude) async {
     try {
       final response = await dio.get(
-        'https://api.aladhan.com/v1/timingsByCity',
+        'https:api.aladhan.com/v1/timingsByCity',
         queryParameters: {
           'city': 'Alexandria',
           'country': 'Egypt',

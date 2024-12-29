@@ -16,11 +16,11 @@ String formatDuration(Duration duration) {
                   ? "${duration.inMinutes.remainder(60)} دقائق"
                   : "${duration.inMinutes.remainder(60)} دقيقة")))
       : "";
- if(duration.inHours >0&&duration.inMinutes>0)
-  return "$hours و $minutes".trim();
- else if(duration.inHours >0&&duration.inMinutes==0)
-  return "$hours".trim();
-  else 
-  return "$hours $minutes".trim();
 
+  if (duration.inHours > 0 && duration.inMinutes > 0)
+    return "$hours و $minutes".trim();
+  else if (duration.inHours > 0 && duration.inMinutes == 0)
+    return "$hours".trim();
+  else
+    return "$hours $minutes".trim();
 }

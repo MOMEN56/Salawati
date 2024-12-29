@@ -6,7 +6,6 @@ import 'package:salawati/services/prayer_times.dart';
 class PrayerTimesService {
   final Dio _dio = Dio();
 
-  // تعديل الدالة لتحميل مواقيت الصلاة لشهر كامل
   Future<List<Map<String, String>>> fetchPrayerTimesForMonth() async {
     List<Map<String, String>> allPrayerTimes = [];
     DateTime now = DateTime.now();

@@ -12,7 +12,7 @@ class PrayerApi {
         queryParameters: {
           'city': 'Alexandria',
           'country': 'Egypt',
-          'method': 8,
+          'method': 5,
         },
       );
 

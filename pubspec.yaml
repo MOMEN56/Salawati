@@ -21,6 +21,7 @@ dependencies:
   connectivity_plus: ^6.1.0
   flutter_offline: ^4.0.0
   device_preview: ^1.2.0
+  flutter_screenutil: ^5.9.3
   
 dev_dependencies:
   flutter_test:

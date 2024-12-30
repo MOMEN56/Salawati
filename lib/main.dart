@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:device_preview/device_preview.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:salawati/screens/homescreen.dart';
 
 void main() {
-  runApp(
-    DevicePreview(
-      builder: (context) => const Salawati(), // Wrap your app with DevicePreview
-    ),
-  );
+  runApp(const Salawati());
 }
 
 class Salawati extends StatelessWidget {
@@ -15,15 +11,17 @@ class Salawati extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Amiri-Regular',
+    return ScreenUtilInit(
+      designSize: const Size(360, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          fontFamily: 'Amiri-Regular',
+        ),
+        home: const Homescreen(),
       ),
-      home: const Homescreen(),
-      useInheritedMediaQuery: true, // Use DevicePreview's media query
-      locale: DevicePreview.locale(context), // Get locale from DevicePreview
-      builder: DevicePreview.appBuilder, // Apply DevicePreview's app builder
     );
   }
 }

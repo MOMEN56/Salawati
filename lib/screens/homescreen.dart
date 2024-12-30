@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:salawati/services/format_duration.dart';
 import 'package:salawati/widgits/custom_app_bar.dart';
 import 'package:salawati/widgits/quranic_verse.dart';
-import 'package:salawati/services/prayer_api.dart'; // استيراد PrayerApi
-import 'package:salawati/models/prayers_model.dart'; // استيراد PrayerApi
-import 'package:connectivity_plus/connectivity_plus.dart'; // استيراد حزمة connectivity_plus
+import 'package:salawati/services/prayer_api.dart';
+import 'package:salawati/models/prayers_model.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -18,20 +19,19 @@ class Homescreen extends StatefulWidget {
 class _HomescreenState extends State<Homescreen> {
   List<Map<String, String>> prayerTimes = [];
   bool isLoading = true;
-  bool hasError = false; // لتخزين حالة الخطأ
-  String remainingTime = ""; // لحفظ الوقت المتبقي على الصلاة القادمة
-  bool isConnected = true; // لتخزين حالة الاتصال بالإنترنت
+  bool hasError = false;
+  String remainingTime = "";
+  bool isConnected = true;
 
-  final PrayerApi _prayerApi = PrayerApi(Dio()); // استخدام PrayerApi
+  final PrayerApi _prayerApi = PrayerApi(Dio());
 
   @override
   void initState() {
     super.initState();
-    _checkConnectivity(); // التحقق من الاتصال بالإنترنت عند تحميل الشاشة
+    _checkConnectivity();
     fetchPrayerTimes();
   }
 
-  // التحقق من الاتصال بالإنترنت
   Future<void> _checkConnectivity() async {
     var connectivityResult = await Connectivity().checkConnectivity();
     setState(() {
@@ -53,29 +53,26 @@ class _HomescreenState extends State<Homescreen> {
           {"time": times['Isha']!, "prayerName": "العشاء"},
         ];
         isLoading = false;
-        hasError = false; // إعادة تعيين حالة الخطأ
+        hasError = false;
       });
-      calculateRemainingTime(); // حساب الوقت المتبقي بعد تحميل الأوقات
+      calculateRemainingTime();
     } catch (e) {
       setState(() {
         isLoading = false;
-        hasError = true; // تعيين حالة الخطأ
+        hasError = true;
       });
       print('Error fetching prayer times: $e');
     }
   }
 
-  // دالة لحساب الوقت المتبقي على الصلاة القادمة
   void calculateRemainingTime() {
-    DateTime now = DateTime.now(); // الوقت الحالي
+    DateTime now = DateTime.now();
     List<DateTime> prayerDateTimes = [];
 
-    // تحويل أوقات الصلاة إلى DateTime
     for (var prayer in prayerTimes) {
       if (prayer['time'] != "00") {
         var timeString = prayer['time']!;
         try {
-          // تحويل الوقت إلى DateTime
           DateTime prayerTime = DateFormat("HH:mm").parse(timeString);
           DateTime prayerDateTime = DateTime(
               now.year, now.month, now.day, prayerTime.hour, prayerTime.minute);
@@ -86,29 +83,24 @@ class _HomescreenState extends State<Homescreen> {
       }
     }
 
-    // تصفية أوقات الصلاة التي لم تأتي بعد
     prayerDateTimes.sort((a, b) => a.compareTo(b));
 
-    // إيجاد أقرب صلاة قادمة
     bool allPrayersPassed = true;
     for (var prayerDateTime in prayerDateTimes) {
       if (prayerDateTime.isAfter(now)) {
-        allPrayersPassed = false; // إذا كانت هناك صلاة لم تنتهي بعد
+        allPrayersPassed = false;
         Duration remainingDuration = prayerDateTime.difference(now);
         setState(() {
-          remainingTime =
-              formatDuration(remainingDuration); // تنسيق الوقت المتبقي
+          remainingTime = formatDuration(remainingDuration);
         });
         break;
       }
     }
 
     if (allPrayersPassed) {
-      // إذا كانت جميع الصلوات قد انتهت، نبحث عن أول صلاة في اليوم التالي
-      DateTime nextDay = now.add(const Duration(days: 1)); // اليوم التالي
+      DateTime nextDay = now.add(const Duration(days: 1));
       List<DateTime> nextDayPrayerTimes = [];
 
-      // تحويل أوقات الصلاة للغد
       for (var prayer in prayerTimes) {
         if (prayer['time'] != "00") {
           var timeString = prayer['time']!;
@@ -123,13 +115,11 @@ class _HomescreenState extends State<Homescreen> {
         }
       }
 
-      nextDayPrayerTimes
-          .sort((a, b) => a.compareTo(b)); // ترتيب أوقات الصلاة للغد
+      nextDayPrayerTimes.sort((a, b) => a.compareTo(b));
 
       Duration remainingDuration = nextDayPrayerTimes.first.difference(now);
       setState(() {
-        remainingTime =
-            formatDuration(remainingDuration); // تنسيق الوقت المتبقي
+        remainingTime = formatDuration(remainingDuration);
       });
     }
   }
@@ -140,7 +130,12 @@ class _HomescreenState extends State<Homescreen> {
       appBar: const CustomAppBar(),
       body: Padding(
         padding:
-            const EdgeInsets.only(right: 16, left: 16, top: 28, bottom: 18),
+EdgeInsets.only(
+  right: MediaQuery.of(context).size.height * 0.02,
+  left: MediaQuery.of(context).size.height * 0.02,
+  top: MediaQuery.of(context).size.height * 0.04,
+  bottom: MediaQuery.of(context).size.height * 0.02,
+),
         child: Column(
           children: [
             if (isLoading)
@@ -168,14 +163,13 @@ class _HomescreenState extends State<Homescreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'حدث خطأ أثناء جلب البيانات\n، تحقق من الاتصال بالإنترنت.',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: MediaQuery.of(context).size.height * 0.02,
                         color: Colors.red,
                       ),
                     ),
-                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
@@ -184,30 +178,35 @@ class _HomescreenState extends State<Homescreen> {
                         });
                         fetchPrayerTimes();
                       },
-                      child: const Text('إعادة المحاولة'),
+                      child: Text(
+                        'إعادة المحاولة',
+                        style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.height * 0.02,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
             if (!isLoading && remainingTime.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 0),
-                child: Column(
-                  children: [
-                    Text(
+              Column(
+                children: [
+                  Center(
+                    child: Text(
                       "الوقت المتبقي على الصلاة: $remainingTime",
-                      style: const TextStyle(
-                          fontSize: 25, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.height * 0.021,
+                          fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 5),
-                    Container(
-                      height: 2,
-                      color: Colors.grey,
-                    ),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.006),
+                  Container(
+                   height: MediaQuery.of(context).size.height * 0.003,
+                    color: Colors.grey,
+                  ),
+                ],
               ),
-            const SizedBox(height: 16),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.0190),
             const QuranicVerse(),
           ],
         ),

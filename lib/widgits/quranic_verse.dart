@@ -1,44 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class QuranicVerse extends StatelessWidget {
   const QuranicVerse({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    double fontSize = MediaQuery.of(context).size.height * 0.017;
+
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Row(
-          mainAxisSize: MainAxisSize.min, // لتقليص العرض حسب المحتوى
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               "﴾",
-              style: TextStyle(fontSize: 14), // حجم الخط للقوس
+              style: TextStyle(fontSize: fontSize),
             ),
-            SizedBox(width: 4), // مسافة بين القوس والنص
+            SizedBox(width: 4),
             Text(
               "إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَوْقُوتًا",
-              style: TextStyle(fontSize: 15), // حجم الخط للنص
+              style: TextStyle(fontSize: fontSize),
             ),
-            SizedBox(width: 4), // مسافة بين النص والقوس الآخر
+            SizedBox(width: 4),
             Text(
               "﴿",
-              style: TextStyle(fontSize: 14), // حجم الخط للقوس الآخر
+              style: TextStyle(fontSize: fontSize),
             ),
             SizedBox(width: 2),
             Text(
               ":",
-              style: TextStyle(fontSize: 15), // حجم الخط لكلمة "قال تعالى"
+              style: TextStyle(fontSize: fontSize),
             ),
-            SizedBox(width: 2), // مسافة بين الآية وكلمة "قال تعالى"
+            SizedBox(width: 2),
             Text(
               "قال تعالى",
-              style: TextStyle(fontSize: 15), // حجم الخط لكلمة "قال تعالى"
+              style: TextStyle(fontSize: fontSize),
             ),
           ],
         ),
-        //SizedBox(height: 4), // مسافة بين الأقسام
       ],
     );
   }

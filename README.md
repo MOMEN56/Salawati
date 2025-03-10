@@ -1,16 +1,13 @@
-# salawati
+Hello guys!
 
-A new Flutter project.
+Today, I'm excited to release my simple app, Salawati | صلواتي 📱✨.
 
-## Getting Started
+This app provides Islamic prayer times 🤲 
 
-This project is a starting point for a Flutter application.
+and calculates the remaining time until the next prayer.
 
-A few resources to get you started if this is your first Flutter project:
+I used the flutter_screenutil package to make the UI responsive.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+For fetching prayer times, I used the AlAdhan API.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+I'm really happy with the result, and hopefully, the next projects will be even better! 🚀
